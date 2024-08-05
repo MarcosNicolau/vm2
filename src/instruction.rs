@@ -5,9 +5,33 @@ use crate::{
     Predicate, World,
 };
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum InstructionVariant {
+    Invalid,
+    Nop,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Jump,
+    Context,
+    Shift,
+    Binop,
+    Ptr,
+    NearCall,
+    Log,
+    FarCall,
+    Ret,
+    Panic,
+    Revert,
+    UMA,
+    LogSRead,
+}
+
 pub struct Instruction {
     pub(crate) handler: Handler,
     pub(crate) arguments: Arguments,
+    pub variant: InstructionVariant,
 }
 
 impl Debug for Instruction {
@@ -37,6 +61,7 @@ pub fn jump_to_beginning() -> Instruction {
     Instruction {
         handler: jump_to_beginning_handler,
         arguments: Arguments::new(Predicate::Always, 0, ModeRequirements::none()),
+        variant: InstructionVariant::Jump,
     }
 }
 fn jump_to_beginning_handler(

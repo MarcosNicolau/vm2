@@ -168,10 +168,10 @@ impl Arguments {
 
 /// This one should only be used when [Register2] is used as well.
 /// It must not be used simultaneously with Absolute/[RelativeStack].
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct Register1(pub Register);
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct Register2(pub Register);
 
 impl Source for Register1 {
@@ -232,10 +232,10 @@ impl DestinationWriter for Register2 {
     }
 }
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct Immediate1(pub u16);
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct Immediate2(pub u16);
 
 impl Source for Immediate1 {
@@ -263,7 +263,7 @@ impl SourceWriter for Immediate2 {
 }
 
 #[derive(Clone)]
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct RegisterAndImmediate {
     pub immediate: u16,
     pub register: Register,
@@ -324,11 +324,12 @@ fn source_stack_address(args: &Arguments, state: &mut impl Addressable) -> u16 {
 }
 
 pub fn destination_stack_address(args: &Arguments, state: &mut impl Addressable) -> u16 {
-    compute_stack_address(
+    let dest = compute_stack_address(
         state,
         args.destination_registers.register1(),
         args.immediate2,
-    )
+    );
+    return dest;
 }
 
 /// Computes register + immediate (mod 2^16).
@@ -337,7 +338,7 @@ fn compute_stack_address(state: &mut impl Addressable, register: Register, immed
     (register.value(state).low_u32() as u16).wrapping_add(immediate)
 }
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct AbsoluteStack(pub RegisterAndImmediate);
 
 impl RegisterPlusImmediate for AbsoluteStack {
@@ -356,7 +357,7 @@ impl StackAddressing for AbsoluteStack {
     }
 }
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct RelativeStack(pub RegisterAndImmediate);
 
 impl RegisterPlusImmediate for RelativeStack {
@@ -380,7 +381,7 @@ impl StackAddressing for RelativeStack {
 }
 
 #[derive(Clone)]
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct AdvanceStackPointer(pub RegisterAndImmediate);
 
 impl RegisterPlusImmediate for AdvanceStackPointer {
@@ -406,7 +407,7 @@ impl StackAddressing for AdvanceStackPointer {
     }
 }
 
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub struct CodePage(pub RegisterAndImmediate);
 
 impl RegisterPlusImmediate for CodePage {
@@ -426,7 +427,7 @@ impl Source for CodePage {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Register(u8);
 
 impl Register {
@@ -486,7 +487,7 @@ impl PackedRegisters {
 }
 
 #[enum_dispatch(SourceWriter)]
-#[cfg_attr(feature = "arbitrary", derive(Arbitrary))]
+#[cfg_attr(feature = "arbitrary", derive(Arbitrary, Debug))]
 pub enum AnySource {
     Register1,
     Immediate1,

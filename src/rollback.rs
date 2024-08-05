@@ -1,4 +1,7 @@
-use std::collections::BTreeMap;
+use std::{
+    collections::BTreeMap,
+    fmt::{Debug, Display},
+};
 
 /// A trait for things that can be rolled back to snapshots
 pub(crate) trait Rollback {
@@ -14,7 +17,7 @@ pub struct RollbackableMap<K: Ord, V> {
     old_entries: Vec<(K, Option<V>)>,
 }
 
-impl<K: Ord + Clone, V: Clone> RollbackableMap<K, V> {
+impl<K: Ord + Clone + Debug, V: Clone + Debug> RollbackableMap<K, V> {
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         let old_value = self.map.insert(key.clone(), value);
         self.old_entries.push((key.clone(), old_value.clone()));
@@ -36,7 +39,7 @@ impl<K: Ord + Clone, V: Clone> RollbackableMap<K, V> {
     }
 }
 
-impl<K: Ord, V> Rollback for RollbackableMap<K, V> {
+impl<K: Debug + Ord, V: Debug> Rollback for RollbackableMap<K, V> {
     type Snapshot = usize;
 
     fn snapshot(&self) -> Self::Snapshot {
@@ -46,8 +49,10 @@ impl<K: Ord, V> Rollback for RollbackableMap<K, V> {
     fn rollback(&mut self, snapshot: Self::Snapshot) {
         for (k, v) in self.old_entries.drain(snapshot..).rev() {
             if let Some(old_value) = v {
+                println!("VALUE TO WRITE IN KEY {:?} IS {:?}", k, old_value);
                 self.map.insert(k, old_value);
             } else {
+                println!("REMOVING KEY {:?}", k);
                 self.map.remove(&k);
             }
         }
@@ -66,7 +71,7 @@ impl<K: Ord, V> AsRef<BTreeMap<K, V>> for RollbackableMap<K, V> {
 
 pub type RollbackableSet<T> = RollbackableMap<T, ()>;
 
-impl<T: Ord + Clone> RollbackableSet<T> {
+impl<T: Ord + Clone + Debug> RollbackableSet<T> {
     pub fn add(&mut self, key: T) {
         self.insert(key, ());
     }

@@ -65,6 +65,7 @@ impl Instruction {
                 .write_source(&burn)
                 .write_destination(&out),
             handler: decommit,
+            variant: crate::instruction::InstructionVariant::Invalid,
         }
     }
 }

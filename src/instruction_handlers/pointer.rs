@@ -1,8 +1,9 @@
 use super::{common::instruction_boilerplate_with_panic, PANIC};
 use crate::{
     addressing_modes::{
-        AbsoluteStack, AdvanceStackPointer, AnyDestination, AnySource, Arguments, CodePage,
-        Destination, Immediate1, Register1, Register2, RelativeStack, Source,
+        AbsoluteStack, Addressable, AdvanceStackPointer, AnyDestination, AnySource, Arguments,
+        CodePage, Destination, Immediate1, Register, Register1, Register2, RelativeStack, Source,
+        SourceWriter,
     },
     fat_pointer::FatPointer,
     instruction::InstructionResult,
@@ -19,12 +20,12 @@ fn ptr<Op: PtrOp, In1: Source, Out: Destination, const SWAP: bool>(
         let ((a, a_is_pointer), (b, b_is_pointer)) = if SWAP {
             (
                 Register2::get_with_pointer_flag(args, &mut vm.state),
-                In1::get_with_pointer_flag_and_erasing(args, &mut vm.state),
+                In1::get_with_pointer_flag(args, &mut vm.state),
             )
         } else {
             (
                 In1::get_with_pointer_flag(args, &mut vm.state),
-                Register2::get_with_pointer_flag_and_erasing(args, &mut vm.state),
+                Register2::get_with_pointer_flag(args, &mut vm.state),
             )
         };
 
@@ -106,6 +107,7 @@ impl Instruction {
                 .write_source(&src1)
                 .write_source(&src2)
                 .write_destination(&out),
+            variant: crate::instruction::InstructionVariant::Ptr,
         }
     }
 }

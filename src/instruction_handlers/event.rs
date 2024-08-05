@@ -63,6 +63,7 @@ impl Instruction {
                 .write_source(&key)
                 .write_source(&value)
                 .write_source(&Immediate1(is_first.into())),
+            variant: crate::instruction::InstructionVariant::Log,
         }
     }
 
@@ -78,6 +79,7 @@ impl Instruction {
                 .write_source(&key)
                 .write_source(&value)
                 .write_source(&Immediate1(is_service.into())),
+            variant: crate::instruction::InstructionVariant::Log,
         }
     }
 }

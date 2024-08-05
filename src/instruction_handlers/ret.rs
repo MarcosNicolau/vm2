@@ -50,7 +50,8 @@ fn ret<const RETURN_TYPE: u8, const TO_LABEL: bool>(
     {
         (
             if TO_LABEL {
-                Immediate1::get(args, &mut vm.state).low_u32() as u16
+                let label = Immediate1::get(args, &mut vm.state).low_u32() as u16;
+                label
             } else if return_type.is_failure() {
                 exception_handler
             } else {
@@ -104,8 +105,10 @@ fn ret<const RETURN_TYPE: u8, const TO_LABEL: bool>(
                     .to_vec();
                 if return_type == ReturnType::Revert {
                     Err(ExecutionEnd::Reverted(output))
-                } else {
+                } else if return_type == ReturnType::Normal {
                     Err(ExecutionEnd::ProgramFinished(output))
+                } else {
+                    Err(ExecutionEnd::Panicked)
                 }
             } else {
                 Err(ExecutionEnd::Panicked)
@@ -160,7 +163,6 @@ pub(crate) fn panic_from_failed_far_call(
     vm.state.register_pointer_flags = 2;
 
     vm.state.flags = Flags::new(true, false, false);
-
     match vm.state.current_frame.pc_from_u16(exception_handler) {
         Some(i) => Ok(i),
         None => Ok(&INVALID_INSTRUCTION),
@@ -175,12 +177,14 @@ pub const INVALID_INSTRUCTION: Instruction = Instruction {
         INVALID_INSTRUCTION_COST,
         ModeRequirements::none(),
     ),
+    variant: crate::instruction::InstructionVariant::Invalid,
 };
 
 pub(crate) const RETURN_COST: u32 = 5;
 pub static PANIC: Instruction = Instruction {
     handler: ret::<{ ReturnType::Panic as u8 }, false>,
     arguments: Arguments::new(Predicate::Always, RETURN_COST, ModeRequirements::none()),
+    variant: crate::instruction::InstructionVariant::Invalid,
 };
 
 /// Turn the current instruction into a panic at no extra cost. (Great value, I know.)
@@ -205,6 +209,7 @@ impl Instruction {
         Self {
             handler: monomorphize!(ret [RETURN_TYPE] match_boolean to_label),
             arguments: arguments.write_source(&src1).write_source(&label),
+            variant: crate::instruction::InstructionVariant::Ret,
         }
     }
     pub fn from_revert(src1: Register1, label: Option<Immediate1>, arguments: Arguments) -> Self {
@@ -213,6 +218,7 @@ impl Instruction {
         Self {
             handler: monomorphize!(ret [RETURN_TYPE] match_boolean to_label),
             arguments: arguments.write_source(&src1).write_source(&label),
+            variant: crate::instruction::InstructionVariant::Revert,
         }
     }
     pub fn from_panic(label: Option<Immediate1>, arguments: Arguments) -> Self {
@@ -221,6 +227,7 @@ impl Instruction {
         Self {
             handler: monomorphize!(ret [RETURN_TYPE] match_boolean to_label),
             arguments: arguments.write_source(&label),
+            variant: crate::instruction::InstructionVariant::Panic,
         }
     }
 

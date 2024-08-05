@@ -114,6 +114,7 @@ fn far_call<const CALLING_MODE: u8, const IS_STATIC: bool, const IS_SHARD: bool>
         .expect("stipend must not cause overflow");
 
     let new_frame_is_static = IS_STATIC || vm.state.current_frame.is_static;
+
     vm.push_frame::<CALLING_MODE>(
         instruction,
         u256_into_address(destination_address),
@@ -272,6 +273,8 @@ impl Instruction {
                 .write_source(&src1)
                 .write_source(&src2)
                 .write_source(&error_handler),
+
+            variant: crate::instruction::InstructionVariant::FarCall,
         }
     }
 }

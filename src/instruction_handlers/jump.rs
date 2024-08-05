@@ -37,6 +37,8 @@ impl Instruction {
             arguments: arguments
                 .write_source(&source)
                 .write_destination(&destination),
+
+            variant: crate::instruction::InstructionVariant::Jump,
         }
     }
 }

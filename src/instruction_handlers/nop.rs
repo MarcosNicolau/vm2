@@ -30,6 +30,7 @@ impl Instruction {
         Self {
             handler: nop,
             arguments: arguments.write_source(&pop).write_destination(&push),
+            variant: crate::instruction::InstructionVariant::Nop,
         }
     }
 }

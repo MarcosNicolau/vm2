@@ -109,7 +109,6 @@ fn store<H: HeapFromState, In: Source, const INCREMENT: bool, const HOOKING_ENAB
 
         let heap = H::get_heap(&vm.state);
         vm.state.heaps.write_u256(heap, address, value);
-
         if INCREMENT {
             Register1::set(args, &mut vm.state, pointer + 32)
         }
@@ -163,7 +162,6 @@ fn load_pointer<const INCREMENT: bool>(
 
         let start = pointer.start + pointer.offset.min(pointer.length);
         let end = start.saturating_add(32).min(pointer.start + pointer.length);
-
         let value = vm.state.heaps[pointer.memory_page].read_u256_partially(start..end);
         Register1::set(args, &mut vm.state, value);
 
@@ -196,6 +194,7 @@ impl Instruction {
         Self {
             handler: monomorphize!(load [H] match_reg_imm src match_boolean increment),
             arguments,
+            variant: crate::instruction::InstructionVariant::UMA,
         }
     }
 
@@ -214,6 +213,8 @@ impl Instruction {
                 .write_source(&src1)
                 .write_source(&src2)
                 .write_destination(&incremented_out),
+
+            variant: crate::instruction::InstructionVariant::UMA,
         }
     }
 
@@ -231,6 +232,8 @@ impl Instruction {
                 .write_source(&src)
                 .write_destination(&out)
                 .write_destination(&incremented_out),
+
+            variant: crate::instruction::InstructionVariant::UMA,
         }
     }
 }

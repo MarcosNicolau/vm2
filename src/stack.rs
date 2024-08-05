@@ -25,7 +25,6 @@ impl Stack {
     pub(crate) fn set(&mut self, slot: u16, value: U256) {
         let written_area = slot as usize / DIRTY_AREA_SIZE;
         self.dirty_areas |= 1 << written_area;
-
         self.slots[slot as usize] = value;
     }
 

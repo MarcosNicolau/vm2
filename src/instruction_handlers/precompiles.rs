@@ -62,6 +62,7 @@ fn precompile_call(
         let address_bytes = vm.state.current_frame.address.0;
         let address_low = u16::from_le_bytes([address_bytes[19], address_bytes[18]]);
         let heaps = &mut vm.state.heaps;
+
         match address_low {
             KECCAK256_ROUND_FUNCTION_PRECOMPILE_ADDRESS => {
                 keccak256_rounds_function::<_, false>(0, query, heaps);
@@ -134,6 +135,7 @@ impl Instruction {
                 .write_source(&burn)
                 .write_destination(&out),
             handler: precompile_call,
+            variant: crate::instruction::InstructionVariant::Nop,
         }
     }
 }

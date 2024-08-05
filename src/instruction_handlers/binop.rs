@@ -20,7 +20,6 @@ fn binop<Op: Binop, In1: Source, Out: Destination, const SWAP: bool, const SET_F
         let a = In1::get(args, &mut vm.state);
         let b = Register2::get(args, &mut vm.state);
         let (a, b) = if SWAP { (b, a) } else { (a, b) };
-
         let (result, out2, flags) = Op::perform(&a, &b);
         Out::set(args, &mut vm.state, result);
         out2.write(args, &mut vm.state);
@@ -220,6 +219,7 @@ impl Instruction {
                 .write_source(&src2)
                 .write_destination(&out)
                 .write_destination(&out2),
+            variant: crate::instruction::InstructionVariant::Binop,
         }
     }
 }

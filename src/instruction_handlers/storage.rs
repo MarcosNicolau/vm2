@@ -78,6 +78,7 @@ impl Instruction {
         Self {
             handler: sstore,
             arguments: arguments.write_source(&src1).write_source(&src2),
+            variant: crate::instruction::InstructionVariant::Nop,
         }
     }
 }
@@ -88,6 +89,7 @@ impl Instruction {
         Self {
             handler: sstore_transient,
             arguments: arguments.write_source(&src1).write_source(&src2),
+            variant: crate::instruction::InstructionVariant::Nop,
         }
     }
 }
@@ -98,6 +100,7 @@ impl Instruction {
         Self {
             handler: sload,
             arguments: arguments.write_source(&src).write_destination(&dst),
+            variant: crate::instruction::InstructionVariant::LogSRead,
         }
     }
 }
@@ -108,6 +111,7 @@ impl Instruction {
         Self {
             handler: sload_transient,
             arguments: arguments.write_source(&src).write_destination(&dst),
+            variant: crate::instruction::InstructionVariant::Nop,
         }
     }
 }

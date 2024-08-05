@@ -127,6 +127,7 @@ impl Instruction {
         Self {
             handler: context::<Op>,
             arguments: arguments.write_destination(&out),
+            variant: crate::instruction::InstructionVariant::Context,
         }
     }
 
@@ -152,23 +153,27 @@ impl Instruction {
         Self {
             handler: context_meta,
             arguments: arguments.write_destination(&out),
+            variant: crate::instruction::InstructionVariant::Context,
         }
     }
     pub fn from_set_context_u128(src: Register1, arguments: Arguments) -> Self {
         Self {
             handler: set_context_u128,
             arguments: arguments.write_source(&src),
+            variant: crate::instruction::InstructionVariant::Context,
         }
     }
     pub fn from_increment_tx_number(arguments: Arguments) -> Self {
         Self {
             handler: increment_tx_number,
             arguments,
+            variant: crate::instruction::InstructionVariant::Context,
         }
     }
     pub fn from_aux_mutating(arguments: Arguments) -> Self {
         Self {
             handler: aux_mutating,
+            variant: crate::instruction::InstructionVariant::Context,
             arguments,
         }
     }

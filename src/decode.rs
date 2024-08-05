@@ -41,6 +41,7 @@ fn unimplemented_instruction(variant: Opcode) -> Instruction {
     Instruction {
         handler: unimplemented_handler,
         arguments,
+        variant: crate::instruction::InstructionVariant::Invalid,
     }
 }
 fn unimplemented_handler(

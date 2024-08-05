@@ -51,6 +51,7 @@ impl Instruction {
                 .write_source(&gas)
                 .write_source(&destination)
                 .write_source(&error_handler),
+            variant: crate::instruction::InstructionVariant::NearCall,
         }
     }
 }
