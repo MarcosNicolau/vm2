@@ -1,3 +1,5 @@
+use crate::addressing_modes::Addressable;
+use crate::debug::debug_instr;
 use crate::heap::HeapId;
 use crate::state::StateSnapshot;
 use crate::world_diff::ExternalSnapshot;
@@ -73,10 +75,12 @@ impl VirtualMachine {
             .program
             .instruction(instruction_number)
             .unwrap();
-
+        let mut i = 0;
         unsafe {
             loop {
                 let args = &(*instruction).arguments;
+
+                debug_instr(&self.state, instruction, &mut i, true, false).unwrap();
 
                 if self.state.use_gas(args.get_static_gas_cost()).is_err()
                     || !args.mode_requirements().met(
@@ -84,6 +88,7 @@ impl VirtualMachine {
                         self.state.current_frame.is_static,
                     )
                 {
+                    // println!("INSTR WITH FREE PANIC: {:?}", (*instruction).variant);
                     instruction = match free_panic(self, world) {
                         Ok(i) => i,
                         Err(e) => return e,
